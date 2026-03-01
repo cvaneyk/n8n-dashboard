@@ -307,11 +307,20 @@ async function fetchRealDataFromN8n() {
         console.log('RAW executions response:', JSON.stringify(rawExec).slice(0, 500));
         console.log('RAW workflows response:', JSON.stringify(rawFlows).slice(0, 500));
 
-        // Normalizar a array (n8n puede devolver array directo, {data:[...]}, o un objeto con otra clave)
+        // Normalizar a array
         n8nExecutions = normalizeToArray(rawExec);
         n8nWorkflows = normalizeToArray(rawFlows);
 
-        console.log(`Received ${n8nExecutions.length} executions and ${n8nWorkflows.length} workflows.`);
+        // Validar que los arrays no estén invertidos
+        // Ejecuciones deben tener campo 'status'; flujos deben tener campo 'name'
+        const execHasStatus = n8nExecutions.length === 0 || n8nExecutions[0].hasOwnProperty('status');
+        const flowsHasName = n8nWorkflows.length === 0 || n8nWorkflows[0].hasOwnProperty('name');
+        if (!execHasStatus || !flowsHasName) {
+            console.warn('⚠️ Las URLs de ejecuciones y flujos parecen estar invertidas. Intercambiando...');
+            [n8nExecutions, n8nWorkflows] = [n8nWorkflows, n8nExecutions];
+        }
+
+        console.log(`✅ ${n8nExecutions.length} ejecuciones cargadas | ${n8nWorkflows.length} flujos cargados`);
 
         // Filtros (Si los botones estuviesen conectados a fetch variables, aquí se filtrarían manualmente los arrays)
         const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
@@ -390,12 +399,14 @@ function switchView(viewName) {
             <h2 style="color:#00e5ff;margin-bottom:20px;"><i class="fa-solid fa-network-wired"></i> Workflows</h2>
             <div style="overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                <thead><tr style="color:#818a91;text-align:left;">
+                <thead><tr style="color:#818a91;text-align:left;border-bottom:1px solid #34384a;">
                     <th style="padding:10px 16px;">Nombre</th>
                     <th style="padding:10px 16px;">Estado</th>
+                    <th style="padding:10px 16px;">Archivado</th>
                     <th style="padding:10px 16px;">Ejecuciones</th>
-                    <th style="padding:10px 16px;">Éxito</th>
-                    <th style="padding:10px 16px;">Errores</th>
+                    <th style="padding:10px 16px;color:#00e5ff;">Éxito</th>
+                    <th style="padding:10px 16px;color:#ff2d6e;">Errores</th>
+                    <th style="padding:10px 16px;">Última actualización</th>
                 </tr></thead>
                 <tbody id="workflowsTableBody"></tbody>
             </table>
@@ -404,8 +415,9 @@ function switchView(viewName) {
 
         const tbody = document.getElementById('workflowsTableBody');
         if (n8nWorkflows.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#818a91;text-align:center;">Sin datos. Refresca primero el monitor.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#818a91;text-align:center;">Sin datos. Refresca primero.</td></tr>`;
         } else {
+            // Contar éxitos/errores por workflowId desde las ejecuciones
             const wfStats = {};
             n8nExecutions.forEach(e => {
                 if (!e.workflowId) return;
@@ -413,23 +425,35 @@ function switchView(viewName) {
                 if (e.status === 'success') wfStats[e.workflowId].success++;
                 else wfStats[e.workflowId].error++;
             });
-            n8nWorkflows.forEach(wf => {
+
+            // Ordenar: activos primero, luego por nº de ejecuciones desc
+            const sortedWf = [...n8nWorkflows].sort((a, b) => {
+                const totalA = ((wfStats[a.id] || {}).success || 0) + ((wfStats[a.id] || {}).error || 0);
+                const totalB = ((wfStats[b.id] || {}).success || 0) + ((wfStats[b.id] || {}).error || 0);
+                if (b.active !== a.active) return b.active ? 1 : -1;
+                return totalB - totalA;
+            });
+
+            sortedWf.forEach(wf => {
                 const stats = wfStats[wf.id] || { success: 0, error: 0 };
                 const total = stats.success + stats.error;
+                const updatedAt = wf.updatedAt ? new Date(wf.updatedAt).toLocaleDateString('es-ES') : '-';
                 const row = document.createElement('tr');
                 row.style.cssText = 'border-top:1px solid #34384a;transition:background 0.2s;';
                 row.onmouseover = () => row.style.background = '#2a2c3b';
                 row.onmouseout = () => row.style.background = '';
                 row.innerHTML = `
-                    <td style="padding:12px 16px;">${wf.name}</td>
+                    <td style="padding:12px 16px;font-weight:500;">${wf.name || '-'}</td>
                     <td style="padding:12px 16px;">
                         <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
                         background:${wf.active ? '#00e5ff22' : '#34384a'};color:${wf.active ? '#00e5ff' : '#818a91'};">
                         ${wf.active ? '● Activo' : '○ Inactivo'}</span>
                     </td>
+                    <td style="padding:12px 16px;color:#818a91;font-size:12px;">${wf.isArchived ? '📦 Sí' : '—'}</td>
                     <td style="padding:12px 16px;">${total}</td>
                     <td style="padding:12px 16px;color:#00e5ff;">${stats.success}</td>
-                    <td style="padding:12px 16px;color:#ff2d6e;">${stats.error}</td>`;
+                    <td style="padding:12px 16px;color:#ff2d6e;">${stats.error}</td>
+                    <td style="padding:12px 16px;color:#818a91;font-size:12px;">${updatedAt}</td>`;
                 tbody.appendChild(row);
             });
         }
@@ -506,7 +530,7 @@ function switchView(viewName) {
                 </div>
                 <div style="background:#1c1f2b;border:1px solid #34384a;border-radius:12px;padding:20px;">
                     <h4 style="color:#00e5ff;margin-bottom:12px;">Auto Refresh</h4>
-                    <p style="font-size:13px;color:#818a91;">Actualmente: cada <strong style="color:#fff;">30 segundos</strong></p>
+                    <p style="font-size:13px;color:#818a91;">Desactivado. Los datos se cargan al abrir la web y al pulsar <strong style="color:#fff;">↻ Actualizar</strong>.</p>
                 </div>
             </div>`;
         mainContent.appendChild(div);
@@ -558,11 +582,9 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchRealDataFromN8n().finally(() => icon.classList.remove('fa-spin'));
     });
 
-    // Auto-refresh cada 30 segundos
-    setInterval(() => {
-        console.log("Auto-refreshing...");
-        refreshBtn.click();
-    }, 30000);
+    // Auto-refresh desactivado — solo carga al abrir o al pulsar el botón
+    // (Para reactivar: descomentar el setInterval de abajo)
+    // setInterval(() => { refreshBtn.click(); }, 30000);
 
     // --- SIDEBAR NAVIGATION ---
     const menuItems = document.querySelectorAll('.menu-item');
