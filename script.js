@@ -5,11 +5,26 @@ const accentCyan = getComputedStyle(document.documentElement).getPropertyValue('
 const accentMagenta = getComputedStyle(document.documentElement).getPropertyValue('--accent-magenta').trim();
 const accentGreen = getComputedStyle(document.documentElement).getPropertyValue('--accent-green').trim();
 
-// --- RAW DATA VARIABLES ---
-// NOTA: n8n webhooks por defecto aceptan POST. Si configuraste el nodo como GET, cámbialo abajo.
-const N8N_WEBHOOK_EJECUCIONES = 'https://coremsa.app.n8n.cloud/webhook/dashboard-n8n?ejecuciones';
-const N8N_WEBHOOK_FLUJOS = 'https://coremsa.app.n8n.cloud/webhook/dashboard-n8n?flujos';
-const FETCH_METHOD = 'POST'; // Cambia a 'GET' si configuraste el webhook en n8n como GET
+// --- CONFIG (persiste en localStorage) ---
+const CFG_DEFAULTS = {
+    execUrl: 'https://coremsa.app.n8n.cloud/webhook/dashboard-n8n?ejecuciones',
+    flowsUrl: 'https://coremsa.app.n8n.cloud/webhook/dashboard-n8n?flujos',
+    method: 'GET'  // n8n está configurado como GET
+};
+
+function loadConfig() {
+    return {
+        execUrl: localStorage.getItem('n8n_exec_url') || CFG_DEFAULTS.execUrl,
+        flowsUrl: localStorage.getItem('n8n_flows_url') || CFG_DEFAULTS.flowsUrl,
+        method: localStorage.getItem('n8n_method') || CFG_DEFAULTS.method
+    };
+}
+
+function saveConfig(execUrl, flowsUrl, method) {
+    localStorage.setItem('n8n_exec_url', execUrl);
+    localStorage.setItem('n8n_flows_url', flowsUrl);
+    localStorage.setItem('n8n_method', method);
+}
 
 // Variables de estado
 let n8nExecutions = [];
@@ -265,10 +280,13 @@ async function fetchRealDataFromN8n() {
     try {
         console.log("Fetching raw data from n8n...");
 
+        // Leer config activa (puede haber cambiado desde la UI)
+        const cfg = loadConfig();
+
         // Ejecuta ambas peticiones en paralelo
         const [execResponse, flowsResponse] = await Promise.all([
-            fetch(N8N_WEBHOOK_EJECUCIONES, { method: FETCH_METHOD, headers: { 'Accept': 'application/json' } }),
-            fetch(N8N_WEBHOOK_FLUJOS, { method: FETCH_METHOD, headers: { 'Accept': 'application/json' } })
+            fetch(cfg.execUrl, { method: cfg.method, headers: { 'Accept': 'application/json' } }),
+            fetch(cfg.flowsUrl, { method: cfg.method, headers: { 'Accept': 'application/json' } })
         ]);
 
         n8nExecutions = await execResponse.json();
@@ -444,21 +462,28 @@ function switchView(viewName) {
         }
 
     } else if (viewName === 'config') {
+        const cfg = loadConfig();
         div.innerHTML = `
             <h2 style="color:#818a91;margin-bottom:24px;"><i class="fa-solid fa-gear"></i> Configuración</h2>
             <div style="display:flex;flex-direction:column;gap:20px;max-width:520px;">
                 <div style="background:#1c1f2b;border:1px solid #34384a;border-radius:12px;padding:20px;">
                     <h4 style="color:#00e5ff;margin-bottom:12px;">Webhooks N8N</h4>
                     <label style="font-size:12px;color:#818a91;">URL Ejecuciones</label>
-                    <input id="cfgExecUrl" value="${N8N_WEBHOOK_EJECUCIONES}" style="width:100%;box-sizing:border-box;background:#0d0f1a;border:1px solid #34384a;color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;margin:6px 0 12px;">
+                    <input id="cfgExecUrl" value="${cfg.execUrl}" style="width:100%;box-sizing:border-box;background:#0d0f1a;border:1px solid #34384a;color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;margin:6px 0 12px;">
                     <label style="font-size:12px;color:#818a91;">URL Flujos</label>
-                    <input id="cfgFlowsUrl" value="${N8N_WEBHOOK_FLUJOS}" style="width:100%;box-sizing:border-box;background:#0d0f1a;border:1px solid #34384a;color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;margin:6px 0 12px;">
+                    <input id="cfgFlowsUrl" value="${cfg.flowsUrl}" style="width:100%;box-sizing:border-box;background:#0d0f1a;border:1px solid #34384a;color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;margin:6px 0 12px;">
                     <label style="font-size:12px;color:#818a91;">Método HTTP</label>
                     <select id="cfgMethod" style="background:#0d0f1a;border:1px solid #34384a;color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;margin:6px 0 12px;width:100%;">
-                        <option value="POST" ${FETCH_METHOD==='POST'?'selected':''}>POST (por defecto n8n)</option>
-                        <option value="GET" ${FETCH_METHOD==='GET'?'selected':''}>GET</option>
+                        <option value="GET"  ${cfg.method === 'GET' ? 'selected' : ''}>GET</option>
+                        <option value="POST" ${cfg.method === 'POST' ? 'selected' : ''}>POST</option>
                     </select>
-                    <p style="font-size:11px;color:#818a91;">⚠️ Si ves errores CORS, asegúrate de que el workflow en n8n tenga el nodo Webhook con "Allowed Origins" configurado (o <code>*</code> para pruebas).</p>
+                    <p style="font-size:11px;color:#818a91;margin-bottom:16px;">
+                        ⚠️ Si ves errores CORS en n8n Cloud, en tu nodo Webhook ve a <strong>Settings → Allowed Origins</strong> y pon <code>*</code> (o el dominio exacto de GitHub Pages).
+                    </p>
+                    <button id="cfgSaveBtn" style="background:linear-gradient(135deg,#00e5ff,#00b4d8);color:#0d0f1a;border:none;padding:10px 24px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;width:100%;transition:opacity 0.2s;">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar configuración
+                    </button>
+                    <p id="cfgSaveMsg" style="display:none;font-size:12px;color:#00e5ff;margin-top:10px;text-align:center;">✓ Guardado. Los próximos fetchs usarán la nueva configuración.</p>
                 </div>
                 <div style="background:#1c1f2b;border:1px solid #34384a;border-radius:12px;padding:20px;">
                     <h4 style="color:#00e5ff;margin-bottom:12px;">Auto Refresh</h4>
@@ -466,6 +491,18 @@ function switchView(viewName) {
                 </div>
             </div>`;
         mainContent.appendChild(div);
+
+        // Botón guardar
+        document.getElementById('cfgSaveBtn').addEventListener('click', () => {
+            const execUrl = document.getElementById('cfgExecUrl').value.trim();
+            const flowsUrl = document.getElementById('cfgFlowsUrl').value.trim();
+            const method = document.getElementById('cfgMethod').value;
+            if (!execUrl || !flowsUrl) return;
+            saveConfig(execUrl, flowsUrl, method);
+            const msg = document.getElementById('cfgSaveMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        });
     }
 }
 
