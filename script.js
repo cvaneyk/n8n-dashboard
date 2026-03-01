@@ -35,6 +35,17 @@ let activeInactiveChartInstance = null;
 let successErrorChartInstance = null;
 let timeDistributionChartInstance = null;
 
+// --- Normalización de respuesta de n8n ---
+// n8n puede devolver array directo, {data:[...]}, {executions:[...]}, {workflows:[...]}, o un objeto único
+function normalizeToArray(raw) {
+    if (Array.isArray(raw)) return raw;                          // Array directo ✓
+    if (raw && Array.isArray(raw.data)) return raw.data;         // { data: [...] }
+    if (raw && Array.isArray(raw.executions)) return raw.executions; // { executions: [...] }
+    if (raw && Array.isArray(raw.workflows)) return raw.workflows;   // { workflows: [...] }
+    if (raw && typeof raw === 'object') return [raw];            // Objeto único → lo envolvemos
+    return [];                                                   // Fallback
+}
+
 // --- Funciones de Procesamiento de Datos ---
 
 function processN8nData(executions, workflows) {
@@ -289,8 +300,16 @@ async function fetchRealDataFromN8n() {
             fetch(cfg.flowsUrl, { method: cfg.method, headers: { 'Accept': 'application/json' } })
         ]);
 
-        n8nExecutions = await execResponse.json();
-        n8nWorkflows = await flowsResponse.json();
+        const rawExec = await execResponse.json();
+        const rawFlows = await flowsResponse.json();
+
+        // Log de la respuesta cruda para depuración
+        console.log('RAW executions response:', JSON.stringify(rawExec).slice(0, 500));
+        console.log('RAW workflows response:', JSON.stringify(rawFlows).slice(0, 500));
+
+        // Normalizar a array (n8n puede devolver array directo, {data:[...]}, o un objeto con otra clave)
+        n8nExecutions = normalizeToArray(rawExec);
+        n8nWorkflows = normalizeToArray(rawFlows);
 
         console.log(`Received ${n8nExecutions.length} executions and ${n8nWorkflows.length} workflows.`);
 
