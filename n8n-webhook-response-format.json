@@ -1,0 +1,26 @@
+{
+  "totalExecutions": 24069,
+  "activePercentage": 82,
+  "errorPercentage": 8,
+  "avgTime": "1.2",
+  "activeWorkflows": 45,
+  "nodesExecuted": "12.5",
+  "timeDistributionLabels": [
+    "1", "2", "3", "4", "5", 
+    "6", "7", "8", "9", "10+"
+  ],
+  "timeDistributionSuccess": [
+    40, 30, 48, 55, 42, 
+    33, 38, 50, 25, 35
+  ],
+  "timeDistributionError": [
+    20, 18, 28, 5, 30, 
+    35, 20, 15, 45, 25
+  ],
+  "workflows": [
+    { "name": "Sync CRM to Notion", "success": 85, "error": 15 },
+    { "name": "Scrape LinkedIn Users", "success": 60, "error": 40 },
+    { "name": "Daily Report Email", "success": 95, "error": 5 },
+    { "name": "Process Stripe Payments", "success": 99, "error": 1 }
+  ]
+}
