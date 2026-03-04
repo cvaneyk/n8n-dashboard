@@ -468,6 +468,7 @@ function switchView(viewName) {
                     <th style="padding:10px 16px;">Fecha</th>
                     <th style="padding:10px 16px;">Duración</th>
                     <th style="padding:10px 16px;">Estado</th>
+                    <th style="padding:10px 16px;">Enlace</th>
                 </tr></thead>
                 <tbody id="errorsTableBody"></tbody>
             </table>
@@ -488,8 +489,11 @@ function switchView(viewName) {
                     const ms = new Date(e.stoppedAt) - new Date(e.startedAt);
                     dur = ms > 0 ? (ms / 1000).toFixed(1) + 's' : '-';
                 }
+                const execUrl = (e.workflowId && e.id)
+                    ? `https://coremsa.app.n8n.cloud/workflow/${e.workflowId}/executions/${e.id}`
+                    : null;
                 const row = document.createElement('tr');
-                row.style.cssText = 'border-top:1px solid #34384a;transition:background 0.2s;';
+                row.style.cssText = 'border-top:1px solid #34384a;transition:background 0.2s;cursor:pointer;';
                 row.onmouseover = () => row.style.background = '#2a2c3b';
                 row.onmouseout = () => row.style.background = '';
                 row.innerHTML = `
@@ -499,6 +503,15 @@ function switchView(viewName) {
                     <td style="padding:12px 16px;">
                         <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#ff2d6e22;color:#ff2d6e;">
                         ✕ ${e.status || 'error'}</span>
+                    </td>
+                    <td style="padding:12px 16px;">
+                        ${execUrl ? `<a href="${execUrl}" target="_blank" rel="noopener noreferrer"
+                            style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;
+                            background:#ff2d6e22;border:1px solid #ff2d6e44;color:#ff2d6e;font-size:11px;
+                            font-weight:600;text-decoration:none;transition:background 0.2s;"
+                            onmouseover="this.style.background='#ff2d6e44'" onmouseout="this.style.background='#ff2d6e22'">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver
+                        </a>` : '-'}
                     </td>`;
                 tbody.appendChild(row);
             });
