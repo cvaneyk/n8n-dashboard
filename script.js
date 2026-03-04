@@ -407,6 +407,7 @@ function switchView(viewName) {
                     <th style="padding:10px 16px;color:#00e5ff;">Éxito</th>
                     <th style="padding:10px 16px;color:#ff2d6e;">Errores</th>
                     <th style="padding:10px 16px;">Última actualización</th>
+                    <th style="padding:10px 16px;">Enlace</th>
                 </tr></thead>
                 <tbody id="workflowsTableBody"></tbody>
             </table>
@@ -442,6 +443,7 @@ function switchView(viewName) {
                 row.style.cssText = 'border-top:1px solid #34384a;transition:background 0.2s;';
                 row.onmouseover = () => row.style.background = '#2a2c3b';
                 row.onmouseout = () => row.style.background = '';
+                const wfUrl = wf.id ? `https://coremsa.app.n8n.cloud/workflow/${wf.id}` : null;
                 row.innerHTML = `
                     <td style="padding:12px 16px;font-weight:500;">${wf.name || '-'}</td>
                     <td style="padding:12px 16px;">
@@ -453,7 +455,16 @@ function switchView(viewName) {
                     <td style="padding:12px 16px;">${total}</td>
                     <td style="padding:12px 16px;color:#00e5ff;">${stats.success}</td>
                     <td style="padding:12px 16px;color:#ff2d6e;">${stats.error}</td>
-                    <td style="padding:12px 16px;color:#818a91;font-size:12px;">${updatedAt}</td>`;
+                    <td style="padding:12px 16px;color:#818a91;font-size:12px;">${updatedAt}</td>
+                    <td style="padding:12px 16px;">
+                        ${wfUrl ? `<a href="${wfUrl}" target="_blank" rel="noopener noreferrer"
+                            style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;
+                            background:#00e5ff22;border:1px solid #00e5ff44;color:#00e5ff;font-size:11px;
+                            font-weight:600;text-decoration:none;transition:background 0.2s;"
+                            onmouseover="this.style.background='#00e5ff44'" onmouseout="this.style.background='#00e5ff22'">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver
+                        </a>` : '-'}
+                    </td>`;
                 tbody.appendChild(row);
             });
         }
