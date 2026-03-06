@@ -1,176 +1,181 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>n8n Status Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Status Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
-<div class="dashboard-container">
-    
+  <div class="dashboard-container">
+
     <!-- SIDEBAR -->
     <aside class="sidebar">
-        <div class="logo">
-            <svg viewBox="0 0 24 24" fill="none" class="n8n-icon" width="28" height="28" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 17 12 22 22 17"></polyline>
-                <polyline points="2 12 12 17 22 12"></polyline>
-            </svg>
-            <h2>N8N<span class="light">_DASH</span></h2>
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" class="n8n-icon" width="28" height="28" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <h2>N8N<span class="light">_DASH</span></h2>
+      </div>
+
+      <nav class="menu">
+        <a href="#" class="menu-item active">
+          <i class="fa-solid fa-chart-line"></i>
+          MONITOR
+        </a>
+        <a href="#" class="menu-item">
+          <i class="fa-solid fa-network-wired"></i>
+          WORKFLOWS
+        </a>
+        <a href="#" class="menu-item">
+          <i class="fa-solid fa-bug"></i>
+          ERRORES
+        </a>
+        <a href="#" class="menu-item">
+          <i class="fa-solid fa-gear"></i>
+          CONFIG
+        </a>
+      </nav>
+
+      <div class="user-profile">
+        <div class="avatar">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=00e5ff&color=fff" alt="Admin">
         </div>
-        
-        <nav class="menu">
-            <a href="#" class="menu-item active">
-                <i class="fa-solid fa-chart-line"></i>
-                MONITOR
-            </a>
-            <a href="#" class="menu-item">
-                <i class="fa-solid fa-network-wired"></i>
-                WORKFLOWS
-            </a>
-            <a href="#" class="menu-item">
-                <i class="fa-solid fa-bug"></i>
-                ERRORES
-            </a>
-            <a href="#" class="menu-item">
-                <i class="fa-solid fa-gear"></i>
-                CONFIG
-            </a>
-        </nav>
-        
-        <div class="user-profile">
-            <div class="avatar">
-               <img src="https://ui-avatars.com/api/?name=Admin&background=00e5ff&color=fff" alt="Admin">
-            </div>
-            <div class="user-info">
-                <h4>System Admin</h4>
-                <p>Status: <span class="status-dot"></span> Online</p>
-            </div>
-            <button class="btn-refresh" id="manualRefreshBtn" title="Actualizar datos">
-                <i class="fa-solid fa-rotate-right"></i>
-            </button>
+        <div class="user-info">
+          <h4>System Admin</h4>
+          <p>Status: <span class="status-dot"></span> Online</p>
         </div>
+        <button class="btn-refresh" id="manualRefreshBtn" title="Actualizar datos">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
     </aside>
 
     <!-- HEADER / FILTERS -->
     <main class="main-content">
-        <header class="top-bar">
-             <div class="date-slider">
-                 <div class="slider-track"></div>
-                 <div class="slider-fill"></div>
-                 <div class="slider-handle left"></div>
-                 <div class="slider-handle right"></div>
-                 <div class="slider-labels">
-                     <span>Today</span>
-                     <span>Last 7 Days</span>
-                     <span>Last 30 Days</span>
-                 </div>
-             </div>
-             
-             <div class="actions">
-                  <div class="filter-group">
-                     <button class="filter-btn active" data-filter="all">Todos</button>
-                     <button class="filter-btn" data-filter="active">Activos</button>
-                     <button class="filter-btn" data-filter="error">Con Errores</button>
-                  </div>
-             </div>
-        </header>
-
-        <!-- WIDGETS GRID -->
-        <div class="grid-layout">
-            
-            <!-- TOTAL EXECUTIONS -->
-            <div class="widget total-executions dark-card">
-                <div class="widget-header">
-                    <h3>EJECUCIONES TOTALES</h3>
-                    <div class="tabs">
-                        <span class="tab active">TOTALES</span>
-                        <span class="tab">EXITOSAS</span>
-                    </div>
-                </div>
-                
-                <div class="total-big-number">
-                    <span id="totalExecutionsCounter">24,069</span>
-                    <p class="subtitle">Ejecuciones en el periodo</p>
-                </div>
-                
-                <div class="donut-charts-container">
-                    <div class="donut-wrapper">
-                        <canvas id="activeInactiveChart"></canvas>
-                        <div class="donut-center-text">
-                           <span id="activePercentage">82</span>%
-                           <small>Activos</small>
-                        </div>
-                    </div>
-                    
-                    <div class="donut-wrapper">
-                        <canvas id="successErrorChart"></canvas>
-                        <div class="donut-center-text pink">
-                           <span id="errorPercentage">8</span>%
-                           <small>Errores</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MAIN CHART (TIME DISTRIBUTION) -->
-            <div class="widget main-chart dark-card">
-                 <div class="widget-header">
-                     <h3>DISTRIBUCIÓN DE EJECUCIONES (TIEMPO)</h3>
-                     <div class="legend">
-                         <span class="legend-item"><i class="fa-solid fa-circle success-color"></i> Éxito</span>
-                         <span class="legend-item"><i class="fa-solid fa-circle error-color"></i> Error</span>
-                     </div>
-                 </div>
-                 
-                 <div class="chart-container">
-                    <canvas id="timeDistributionChart"></canvas>
-                 </div>
-            </div>
-
-            <!-- METRICS SUMMARY MINIS -->
-            <div class="widget summary-metrics dark-card">
-                <div class="metric-box">
-                    <h4>TIEMPO PROMEDIO</h4>
-                    <div class="value" id="avgTime">1.2<span>s</span></div>
-                    <p class="trend positive"><i class="fa-solid fa-arrow-down"></i> 0.3s más rápido</p>
-                </div>
-                <div class="metric-box">
-                    <h4>FLUJOS ACTIVOS</h4>
-                    <div class="value" id="activeWorkflows">45</div>
-                    <p class="trend neutral">Sin cambios</p>
-                </div>
-                <div class="metric-box">
-                    <h4>NODOS EJECUTADOS</h4>
-                    <div class="value" id="nodesExecuted">12.5<span>K</span></div>
-                    <p class="trend positive"><i class="fa-solid fa-arrow-up"></i> 12% más</p>
-                </div>
-            </div>
-
-            <!-- LOWER BAR CHARTS (BY WORKFLOW) -->
-            <div class="widget workflows-breakdown dark-card full-width">
-                 <div class="widget-header breakdown-tabs">
-                    <button class="btab active">POR FLUJO</button>
-                    <button class="btab">POR TIEMPO EJECUCIÓN</button>
-                    <button class="btab">FLUJOS CON ERRORES</button>
-                 </div>
-                 <div class="horizontal-bars-container" id="workflowsBarsContainer">
-                     <!-- Javascript will populate this -->
-                 </div>
-            </div>
-
+      <header class="top-bar">
+        <div class="date-slider">
+          <div class="slider-track"></div>
+          <div class="slider-fill"></div>
+          <div class="slider-handle left"></div>
+          <div class="slider-handle right"></div>
+          <div class="slider-labels">
+            <span>Today</span>
+            <span>Last 7 Days</span>
+            <span>Last 30 Days</span>
+          </div>
         </div>
+
+        <div class="actions">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="active">Activos</button>
+            <button class="filter-btn" data-filter="error">Con Errores</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- WIDGETS GRID -->
+      <div class="grid-layout">
+
+        <!-- TOTAL EXECUTIONS -->
+        <div class="widget total-executions dark-card">
+          <div class="widget-header">
+            <h3>EJECUCIONES TOTALES</h3>
+            <div class="tabs">
+              <span class="tab active">TOTALES</span>
+              <span class="tab">EXITOSAS</span>
+            </div>
+          </div>
+
+          <div class="total-big-number">
+            <span id="totalExecutionsCounter">24,069</span>
+            <p class="subtitle">Ejecuciones en el periodo</p>
+          </div>
+
+          <div class="donut-charts-container">
+            <div class="donut-wrapper">
+              <canvas id="activeInactiveChart"></canvas>
+              <div class="donut-center-text">
+                <span id="activePercentage">82</span>%
+                <small>Activos</small>
+              </div>
+            </div>
+
+            <div class="donut-wrapper">
+              <canvas id="successErrorChart"></canvas>
+              <div class="donut-center-text pink">
+                <span id="errorPercentage">8</span>%
+                <small>Errores</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN CHART (TIME DISTRIBUTION) -->
+        <div class="widget main-chart dark-card">
+          <div class="widget-header">
+            <h3>DISTRIBUCIÓN DE EJECUCIONES (TIEMPO)</h3>
+            <div class="legend">
+              <span class="legend-item"><i class="fa-solid fa-circle success-color"></i> Éxito</span>
+              <span class="legend-item"><i class="fa-solid fa-circle error-color"></i> Error</span>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="timeDistributionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- METRICS SUMMARY MINIS -->
+        <div class="widget summary-metrics dark-card">
+          <div class="metric-box">
+            <h4>TIEMPO PROMEDIO</h4>
+            <div class="value" id="avgTime">1.2<span>s</span></div>
+            <p class="trend positive"><i class="fa-solid fa-arrow-down"></i> 0.3s más rápido</p>
+          </div>
+          <div class="metric-box">
+            <h4>FLUJOS ACTIVOS</h4>
+            <div class="value" id="activeWorkflows">45</div>
+            <p class="trend neutral">Sin cambios</p>
+          </div>
+          <div class="metric-box">
+            <h4>NODOS EJECUTADOS</h4>
+            <div class="value" id="nodesExecuted">12.5<span>K</span></div>
+            <p class="trend positive"><i class="fa-solid fa-arrow-up"></i> 12% más</p>
+          </div>
+        </div>
+
+        <!-- LOWER BAR CHARTS (BY WORKFLOW) -->
+        <div class="widget workflows-breakdown dark-card full-width">
+          <div class="widget-header breakdown-tabs">
+            <button class="btab active">POR FLUJO</button>
+            <button class="btab">POR TIEMPO EJECUCIÓN</button>
+            <button class="btab">FLUJOS CON ERRORES</button>
+          </div>
+          <div class="horizontal-bars-container" id="workflowsBarsContainer">
+            <!-- Javascript will populate this -->
+          </div>
+        </div>
+
+      </div>
     </main>
 
-</div>
+  </div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>
