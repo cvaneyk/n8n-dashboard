@@ -99,7 +99,7 @@
           </div>
 
           <div class="total-big-number">
-            <span id="totalExecutionsCounter">24,069</span>
+            <span id="totalExecutionsCounter" class="skeleton">24,069</span>
             <p class="subtitle">Ejecuciones en el periodo</p>
           </div>
 
@@ -107,7 +107,7 @@
             <div class="donut-wrapper">
               <canvas id="activeInactiveChart"></canvas>
               <div class="donut-center-text">
-                <span id="activePercentage">82</span>%
+                <span id="activePercentage" class="skeleton">82</span>%
                 <small>Activos</small>
               </div>
             </div>
@@ -115,7 +115,7 @@
             <div class="donut-wrapper">
               <canvas id="successErrorChart"></canvas>
               <div class="donut-center-text pink">
-                <span id="errorPercentage">8</span>%
+                <span id="errorPercentage" class="skeleton">8</span>%
                 <small>Errores</small>
               </div>
             </div>
@@ -133,7 +133,7 @@
           </div>
 
           <div class="chart-container">
-            <canvas id="timeDistributionChart"></canvas>
+            <canvas id="timeDistributionChart" class="skeleton"></canvas>
           </div>
         </div>
 
@@ -141,17 +141,17 @@
         <div class="widget summary-metrics dark-card">
           <div class="metric-box">
             <h4>TIEMPO PROMEDIO</h4>
-            <div class="value" id="avgTime">1.2<span>s</span></div>
+            <div class="value skeleton" id="avgTime">1.2<span>s</span></div>
             <p class="trend positive"><i class="fa-solid fa-arrow-down"></i> 0.3s más rápido</p>
           </div>
           <div class="metric-box">
             <h4>FLUJOS ACTIVOS</h4>
-            <div class="value" id="activeWorkflows">45</div>
+            <div class="value skeleton" id="activeWorkflows">45</div>
             <p class="trend neutral">Sin cambios</p>
           </div>
           <div class="metric-box">
             <h4>NODOS EJECUTADOS</h4>
-            <div class="value" id="nodesExecuted">12.5<span>K</span></div>
+            <div class="value skeleton" id="nodesExecuted">12.5<span>K</span></div>
             <p class="trend positive"><i class="fa-solid fa-arrow-up"></i> 12% más</p>
           </div>
         </div>

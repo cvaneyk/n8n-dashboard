@@ -175,7 +175,9 @@ function initDonutChart(canvasId, value, color, centerTextId) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   const remaining = 100 - value;
 
-  document.getElementById(centerTextId).innerText = value;
+  const textEl = document.getElementById(centerTextId);
+  textEl.innerText = value;
+  textEl.classList.remove("skeleton");
 
   return new Chart(ctx, {
     type: "doughnut",
@@ -291,12 +293,21 @@ function renderHorizontalBars(workflows) {
 
 // --- Main Update UI Function ---
 function updateDashboardData(data) {
-  document.getElementById("totalExecutionsCounter").innerText =
-    data.totalExecutions.toLocaleString();
-  document.getElementById("avgTime").innerHTML =
-    `${data.avgTime}<span>s</span>`;
-  document.getElementById("activeWorkflows").innerText = data.activeWorkflows;
-  document.getElementById("nodesExecuted").innerHTML = `${data.nodesExecuted}`;
+  const totalEl = document.getElementById("totalExecutionsCounter");
+  totalEl.innerText = data.totalExecutions.toLocaleString();
+  totalEl.classList.remove("skeleton");
+
+  const avgTimeEl = document.getElementById("avgTime");
+  avgTimeEl.innerHTML = `${data.avgTime}<span>s</span>`;
+  avgTimeEl.classList.remove("skeleton");
+
+  const actWfEl = document.getElementById("activeWorkflows");
+  actWfEl.innerText = data.activeWorkflows;
+  actWfEl.classList.remove("skeleton");
+
+  const nodesExEl = document.getElementById("nodesExecuted");
+  nodesExEl.innerHTML = `${data.nodesExecuted}`;
+  nodesExEl.classList.remove("skeleton");
 
   if (activeInactiveChartInstance) activeInactiveChartInstance.destroy();
   if (successErrorChartInstance) successErrorChartInstance.destroy();
@@ -405,9 +416,20 @@ async function fetchRealDataFromN8n() {
 }
 
 function showFetchError(msg) {
-  document.getElementById("totalExecutionsCounter").innerText = "ERR";
-  document.getElementById("avgTime").innerText = "ERR";
-  document.getElementById("activeWorkflows").innerText = "ERR";
+  [
+    "totalExecutionsCounter",
+    "avgTime",
+    "activeWorkflows",
+    "nodesExecuted",
+    "activePercentage",
+    "errorPercentage",
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerText = "ERR";
+      el.classList.remove("skeleton");
+    }
+  });
 
   // Mostrar banner de error si existe
   let banner = document.getElementById("errorBanner");
