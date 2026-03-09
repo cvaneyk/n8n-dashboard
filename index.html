@@ -93,13 +93,13 @@
       <div class="grid-layout">
 
         <!-- TOTAL EXECUTIONS -->
-        <div class="widget total-executions dark-card">
+        <div class="widget total-executions dark-card skeleton">
           <div class="widget-header">
             <h3>EJECUCIONES TOTALES</h3>
           </div>
 
           <div class="total-big-number">
-            <span id="totalExecutionsCounter" class="skeleton">24,069</span>
+            <span id="totalExecutionsCounter">24,069</span>
             <p class="subtitle">Ejecuciones en el periodo</p>
           </div>
 
@@ -107,7 +107,7 @@
             <div class="donut-wrapper">
               <canvas id="activeInactiveChart"></canvas>
               <div class="donut-center-text">
-                <span id="activePercentage" class="skeleton">82</span>%
+                <span id="activePercentage">82</span>%
                 <small>Activos</small>
               </div>
             </div>
@@ -115,7 +115,7 @@
             <div class="donut-wrapper">
               <canvas id="successErrorChart"></canvas>
               <div class="donut-center-text pink">
-                <span id="errorPercentage" class="skeleton">8</span>%
+                <span id="errorPercentage">8</span>%
                 <small>Errores</small>
               </div>
             </div>
@@ -123,7 +123,7 @@
         </div>
 
         <!-- MAIN CHART (TIME DISTRIBUTION) -->
-        <div class="widget main-chart dark-card">
+        <div class="widget main-chart dark-card skeleton">
           <div class="widget-header">
             <h3>DISTRIBUCIÓN DE EJECUCIONES (TIEMPO)</h3>
             <div class="legend">
@@ -133,25 +133,25 @@
           </div>
 
           <div class="chart-container">
-            <canvas id="timeDistributionChart" class="skeleton"></canvas>
+            <canvas id="timeDistributionChart"></canvas>
           </div>
         </div>
 
         <!-- METRICS SUMMARY MINIS -->
         <div class="widget summary-metrics dark-card">
-          <div class="metric-box">
+          <div class="metric-box skeleton">
             <h4>TIEMPO PROMEDIO</h4>
-            <div class="value skeleton" id="avgTime">1.2<span>s</span></div>
+            <div class="value" id="avgTime">1.2<span>s</span></div>
             <p class="trend positive"><i class="fa-solid fa-arrow-down"></i> 0.3s más rápido</p>
           </div>
-          <div class="metric-box">
+          <div class="metric-box skeleton">
             <h4>FLUJOS ACTIVOS</h4>
-            <div class="value skeleton" id="activeWorkflows">45</div>
+            <div class="value" id="activeWorkflows">45</div>
             <p class="trend neutral">Sin cambios</p>
           </div>
-          <div class="metric-box">
+          <div class="metric-box skeleton">
             <h4>NODOS EJECUTADOS</h4>
-            <div class="value skeleton" id="nodesExecuted">12.5<span>K</span></div>
+            <div class="value" id="nodesExecuted">12.5<span>K</span></div>
             <p class="trend positive"><i class="fa-solid fa-arrow-up"></i> 12% más</p>
           </div>
         </div>
@@ -163,7 +163,7 @@
             <button class="btab">POR TIEMPO EJECUCIÓN</button>
             <button class="btab">FLUJOS CON ERRORES</button>
           </div>
-          <div class="horizontal-bars-container" id="workflowsBarsContainer">
+          <div class="horizontal-bars-container skeleton" id="workflowsBarsContainer">
             <!-- Javascript will populate this -->
           </div>
         </div>

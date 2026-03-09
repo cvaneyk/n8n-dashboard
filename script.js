@@ -208,6 +208,11 @@ function initDonutChart(canvasId, value, color, centerTextId) {
 function initMainChart(data) {
   const ctx = document.getElementById("timeDistributionChart").getContext("2d");
 
+  const mainChartContainer = document.querySelector(".main-chart");
+  if (mainChartContainer) {
+    mainChartContainer.classList.remove("skeleton");
+  }
+
   if (timeDistributionChartInstance) {
     timeDistributionChartInstance.destroy();
   }
@@ -272,6 +277,7 @@ function initMainChart(data) {
 function renderHorizontalBars(workflows) {
   const container = document.getElementById("workflowsBarsContainer");
   container.innerHTML = "";
+  container.classList.remove("skeleton");
 
   workflows.forEach((wf) => {
     const group = document.createElement("div");
@@ -293,21 +299,26 @@ function renderHorizontalBars(workflows) {
 
 // --- Main Update UI Function ---
 function updateDashboardData(data) {
+  const totalWidget = document.querySelector(".widget.total-executions");
+  if (totalWidget) {
+    totalWidget.classList.remove("skeleton");
+  }
+
+  const metricBoxes = document.querySelectorAll(".metric-box");
+  metricBoxes.forEach((box) => box.classList.remove("skeleton"));
+
   const totalEl = document.getElementById("totalExecutionsCounter");
   totalEl.innerText = data.totalExecutions.toLocaleString();
   totalEl.classList.remove("skeleton");
 
   const avgTimeEl = document.getElementById("avgTime");
   avgTimeEl.innerHTML = `${data.avgTime}<span>s</span>`;
-  avgTimeEl.classList.remove("skeleton");
 
   const actWfEl = document.getElementById("activeWorkflows");
   actWfEl.innerText = data.activeWorkflows;
-  actWfEl.classList.remove("skeleton");
 
   const nodesExEl = document.getElementById("nodesExecuted");
   nodesExEl.innerHTML = `${data.nodesExecuted}`;
-  nodesExEl.classList.remove("skeleton");
 
   if (activeInactiveChartInstance) activeInactiveChartInstance.destroy();
   if (successErrorChartInstance) successErrorChartInstance.destroy();
@@ -416,6 +427,24 @@ async function fetchRealDataFromN8n() {
 }
 
 function showFetchError(msg) {
+  const totalWidget = document.querySelector(".widget.total-executions");
+  if (totalWidget) {
+    totalWidget.classList.remove("skeleton");
+  }
+
+  const metricBoxes = document.querySelectorAll(".metric-box");
+  metricBoxes.forEach((box) => box.classList.remove("skeleton"));
+
+  const workflowsContainer = document.getElementById("workflowsBarsContainer");
+  if (workflowsContainer) {
+    workflowsContainer.classList.remove("skeleton");
+  }
+
+  const mainChartContainer = document.querySelector(".main-chart");
+  if (mainChartContainer) {
+    mainChartContainer.classList.remove("skeleton");
+  }
+
   [
     "totalExecutionsCounter",
     "avgTime",
