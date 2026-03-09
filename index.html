@@ -50,9 +50,9 @@
       </nav>
 
       <div class="user-profile">
-        <div class="avatar">
+        <!-- <div class="avatar">
           <img src="https://ui-avatars.com/api/?name=Admin&background=00e5ff&color=fff" alt="Admin">
-        </div>
+        </div> -->
         <div class="user-info">
           <h4>System Admin</h4>
           <p>Status: <span class="status-dot"></span> Online</p>
@@ -67,14 +67,16 @@
     <main class="main-content">
       <header class="top-bar">
         <div class="date-slider">
-          <div class="slider-track"></div>
-          <div class="slider-fill"></div>
-          <div class="slider-handle left"></div>
-          <div class="slider-handle right"></div>
+          <label for="daySlider" class="slider-title">Días de historial a mostrar:</label>
+          <input type="range" id="daySlider" class="styled-slider" min="1" max="7" step="1" value="7">
           <div class="slider-labels">
-            <span>Today</span>
-            <span>Last 7 Days</span>
-            <span>Last 30 Days</span>
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+            <span>6</span>
+            <span>7</span>
           </div>
         </div>
 
@@ -94,10 +96,6 @@
         <div class="widget total-executions dark-card">
           <div class="widget-header">
             <h3>EJECUCIONES TOTALES</h3>
-            <div class="tabs">
-              <span class="tab active">TOTALES</span>
-              <span class="tab">EXITOSAS</span>
-            </div>
           </div>
 
           <div class="total-big-number">
